@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "foodclassification"
+version = "0.1.0"
+description = ""
+authors = ["jakem <mazurkiewiczj@duq.edu>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.11"
+tensorflow-io-gcs-filesystem = { version = "0.27.0"}
+numpy = "^1.26.4"
+requests = "^2.31.0"
+bs4 = "^0.0.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
