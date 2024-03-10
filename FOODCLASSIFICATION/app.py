@@ -1,5 +1,6 @@
 import streamlit as st
 from PIL import Image
+import tensorflow as tf
 from keras.preprocessing.image import load_img, img_to_array
 import numpy as np
 from keras.models import load_model
@@ -80,6 +81,7 @@ def processed_img(img_path):
     y = int(y)
     res = labels[y]
     print(res)
+    #Returning label 
     return res.capitalize()
 
 
@@ -93,8 +95,13 @@ def run():
     if img_file is not None:
         #Reading in the image
         img = Image.open(img_file).resize((250, 250))
+
+        #Displaying the image in streamlit app
         st.image(img, use_column_width=False)
+        #Saving file path of uploaded image
         save_image_path = './upload_images/' + img_file.name
+
+        #Saving image to new path
         with open(save_image_path, "wb") as f:
             f.write(img_file.getbuffer())
 
@@ -104,14 +111,18 @@ def run():
             result = processed_img(save_image_path)
             print(result)
 
+            #If the uploaded image is predicted to be a vegetable
             if result in vegetables:
                 st.info('**Category : Vegetables**')
+            
+            #If uploaded image predicted to be a fruit
             else:
                 st.info('**Category : Fruit**')
 
+            #Using Streamlit success method
             st.success("**Predicted : " + result + '**')
 
-            #Returning the calories of the predicted food label
+            #Returning the calories of the predicted food label if valid
             cal = fetch_calories(result)
             if cal:
                 st.warning('**' + cal + '(100 grams)**')
