@@ -87,7 +87,7 @@ def processed_img(img_path):
 
 def run():
     #Defining title
-    st.title("Eat Right! Fruit and Vegetable Classification Model")
+    st.title("Eat Right! Fruit and Vegetable Classification Model!")
 
     #Allowing user to upload an image of their fruit or vegetable
     img_file = st.file_uploader("Choose an Image", type=["jpg", "png"])
@@ -98,8 +98,9 @@ def run():
 
         #Displaying the image in streamlit app
         st.image(img, use_column_width=False)
+
         #Saving file path of uploaded image
-        save_image_path = './upload_images/' + img_file.name
+        save_image_path = r'C:\Users\jakem\FoodClassification\FOODCLASSIFICATION\upload_images' + img_file.name 
 
         #Saving image to new path
         with open(save_image_path, "wb") as f:
