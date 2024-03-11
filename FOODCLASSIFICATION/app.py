@@ -8,7 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 
 #Loading Saved model
-model = load_model(r'C:\Users\jakem\FoodClassification\FOODCLASSIFICATION\model\PretrainedModel.h5')
+model = load_model(r"C:\Users\jakem\OneDrive\Desktop\School\Machine Learning\Final Project\Saved_Model\PretrainedModel2.h5")
 
 #Defining Labels for Food
 labels = {0: 'apple', 1: 'banana', 2: 'beetroot', 3: 'bell pepper', 4: 'cabbage', 5: 'capsicum', 6: 'carrot',
@@ -29,7 +29,7 @@ vegetables = ['Beetroot', 'Cabbage', 'Capsicum', 'Carrot', 'Cauliflower', 'Corn'
 
 def fetch_calories(prediction) -> str:
     """
-    This functions scapes the web to find the calories of a passed in image
+    This functions scrapes the web to find the calories of a passed in image
     """
 
     try:
