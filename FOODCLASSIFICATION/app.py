@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 
 #Loading Saved model
 model = load_model(r"C:\Users\jakem\OneDrive\Desktop\School\Machine Learning\Final Project\Saved_Model\PretrainedModel2.h5")
+#model2 = load_model(r"C:\Users\jakem\OneDrive\Desktop\School\Machine Learning\Final Project\Saved_Model\CustomModel.h5")
 
 #Defining Labels for Food
 labels = {0: 'apple', 1: 'banana', 2: 'beetroot', 3: 'bell pepper', 4: 'cabbage', 5: 'capsicum', 6: 'carrot',
@@ -27,23 +28,23 @@ vegetables = ['Beetroot', 'Cabbage', 'Capsicum', 'Carrot', 'Cauliflower', 'Corn'
               'Tomato', 'Turnip']
 
 
-def fetch_calories(prediction) -> str:
+def scrape_for_calories(prediction) -> str:
     """
     This functions scrapes the web to find the calories of a passed in image
     """
 
     try:
         #Googling the calories in the passed in food, storing as a URL
-        url = 'https://www.google.com/search?&q=calories in ' + prediction
+        url_for_search = 'https://www.google.com/search?&q=calories in ' + prediction
 
         #Retrieving the text from the URL
-        req = requests.get(url).text
+        text = requests.get(url_for_search).text
 
         #Using the Beautiful Soup Web Scraper to parse the HTML and store in calories variable
-        scrap = BeautifulSoup(req, 'html.parser')
-        calories = scrap.find("div", class_="BNeawe iBp4i AP7Wnd").text
+        scraper = BeautifulSoup(text, 'html.parser')
+        cal = scraper.find("div", class_="BNeawe iBp4i AP7Wnd").text
 
-        return calories
+        return cal
     
     except Exception as e:
         #Returning error message from streamlit if it cannot find
@@ -51,41 +52,42 @@ def fetch_calories(prediction) -> str:
         print(e)
 
 
-def processed_img(img_path):
+def processed_img(img_path) -> str:
     """
     This function takes in the path of an image and returns the predicted label of the image
     using a pretrained model
     """
 
     #Loading image of the target size
-    img = load_img(img_path, target_size=(224, 224, 3))
+    food_image = load_img(img_path, target_size=(224, 224, 3))
 
     #Converting image to an array of values
-    img = img_to_array(img)
+    food_image = img_to_array(food_image)
 
     #Normalizing the pixels
-    img = img / 255
+    food_image = food_image / 255
 
-    img = np.expand_dims(img, [0])
+    food_image = np.expand_dims(food_image, [0])
 
     #Predicting the image class using the given model
-    answer = model.predict(img)
+    pred = model.predict(food_image)
     
     #Storing answer as most probable prediction
-    y_class = answer.argmax(axis=-1)
-
-    print(y_class)
+    y_class = pred.argmax(axis=-1)
 
     #Printing the label from the list
     y = " ".join(str(x) for x in y_class)
     y = int(y)
-    res = labels[y]
-    print(res)
+    result = labels[y]
+
     #Returning label 
-    return res.capitalize()
+    return result.capitalize()
 
 
 def run():
+    """
+    This function runs the streamlit server
+    """
     #Defining title
     st.title("Eat Right! Fruit and Vegetable Classification Model!")
 
@@ -106,7 +108,6 @@ def run():
         with open(save_image_path, "wb") as f:
             f.write(img_file.getbuffer())
 
-        # if st.button("Predict"):
         if img_file is not None:
             #Running prediction function on image if valid
             result = processed_img(save_image_path)
@@ -114,19 +115,19 @@ def run():
 
             #If the uploaded image is predicted to be a vegetable
             if result in vegetables:
-                st.info('**Category : Vegetables**')
+                st.info('**This image is a vegetable!**')
             
             #If uploaded image predicted to be a fruit
             else:
-                st.info('**Category : Fruit**')
+                st.info('**This image is a fruit!**')
 
             #Using Streamlit success method
-            st.success("**Predicted : " + result + '**')
+            st.success("**The model predicts this is a : " + result + '**')
 
             #Returning the calories of the predicted food label if valid
-            cal = fetch_calories(result)
+            cal = scrape_for_calories(result)
             if cal:
-                st.warning('**' + cal + '(100 grams)**')
+                st.warning('**' + cal + ' for a serrving of 100 grams**')
 
 
 if __name__ == '__main__':
