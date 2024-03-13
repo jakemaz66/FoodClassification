@@ -6,20 +6,31 @@ import numpy as np
 from keras.models import load_model
 import requests
 from bs4 import BeautifulSoup
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
-#Loading Saved model
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+
+#Loading Saved models
 model = load_model(r"C:\Users\jakem\OneDrive\Desktop\School\Machine Learning\Final Project\Saved_Model\PretrainedModel2.h5")
 #model2 = load_model(r"C:\Users\jakem\OneDrive\Desktop\School\Machine Learning\Final Project\Saved_Model\CustomModel.h5")
 
-#Defining Labels for Food
-labels = {0: 'apple', 1: 'banana', 2: 'beetroot', 3: 'bell pepper', 4: 'cabbage', 5: 'capsicum', 6: 'carrot',
-          7: 'cauliflower', 8: 'chilli pepper', 9: 'corn', 10: 'cucumber', 11: 'eggplant', 12: 'garlic', 13: 'ginger',
-          14: 'grapes', 15: 'jalepeno', 16: 'kiwi', 17: 'lemon', 18: 'lettuce',
-          19: 'mango', 20: 'onion', 21: 'orange', 22: 'paprika', 23: 'pear', 24: 'peas', 25: 'pineapple',
-          26: 'pomegranate', 27: 'potato', 28: 'raddish', 29: 'soy beans', 30: 'spinach', 31: 'sweetcorn',
-          32: 'sweetpotato', 33: 'tomato', 34: 'turnip', 35: 'watermelon'}
+#Defining Labels for Food in a Dictionary
+labels = {0: 'apple', 1: 'banana', 2: 'beetroot', 
+          3: 'bell pepper', 4: 'cabbage', 5: 'capsicum', 
+          6: 'carrot', 7: 'cauliflower', 8: 'chilli pepper', 
+          9: 'corn', 10: 'cucumber', 11: 'eggplant', 
+          12: 'garlic', 13: 'ginger',14: 'grapes', 
+          15: 'jalepeno', 16: 'kiwi', 17: 'lemon', 
+          18: 'lettuce',19: 'mango', 20: 'onion', 
+          21: 'orange', 22: 'paprika', 23: 'pear', 
+          24: 'peas', 25: 'pineapple',26: 'pomegranate', 
+          27: 'potato', 28: 'raddish', 29: 'soy beans', 
+          30: 'spinach', 31: 'sweetcorn',32: 'sweetpotato', 
+          33: 'tomato', 34: 'turnip', 35: 'watermelon'}
 
-#Creating lists of Fruits and Vegetables
+#Creating lists of Fruits and Vegetables the Model was trained on
 fruits = ['Apple', 'Banana', 'Bello Pepper', 'Chilli Pepper', 'Grapes', 'Jalepeno', 'Kiwi', 'Lemon', 'Mango', 'Orange',
           'Paprika', 'Pear', 'Pineapple', 'Pomegranate', 'Watermelon']
 
@@ -42,16 +53,49 @@ def scrape_for_calories(prediction) -> str:
 
         #Using the Beautiful Soup Web Scraper to parse the HTML and store in calories variable
         scraper = BeautifulSoup(text, 'html.parser')
+
         cal = scraper.find("div", class_="BNeawe iBp4i AP7Wnd").text
 
         return cal
     
-    except Exception as e:
+    except Exception as error:
+
         #Returning error message from streamlit if it cannot find
-        st.error("Can't able to fetch the Calories")
-        print(e)
+        st.error("Was not able to detect the calories for this item, eat with caution!")
+        print(error)
 
+def return_facts(prediction):
+    """
+    This functions uses a huggingface model to return facts for the predicted food
+    """
+    #Checking if GPU compatiable device available
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device
 
+    #Loading in pretrained gpt 2 model from huggingface
+    model_name = "gpt2-large"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+    #Transporting model to device
+    model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
+
+    #Prompting model with fun facts about predicted food
+    input_text = "Fun facts about the predicted food. " + prediction + "s"
+    max_length = 110
+
+    #Tokenizing input text
+    input_ids = tokenizer(input_text, return_tensors="pt")
+
+    input_ids = input_ids['input_ids'].to(device)
+
+    #Generating model output
+    output = model.generate(input_ids, max_length=max_length, num_beams=5,
+                        do_sample=False, no_repeat_ngram_size=2)
+
+    #Returning a decoded version (real words) of output
+    return tokenizer.decode(output[0])
+
+   
 def processed_img(img_path) -> str:
     """
     This function takes in the path of an image and returns the predicted label of the image
@@ -64,7 +108,7 @@ def processed_img(img_path) -> str:
     #Converting image to an array of values
     food_image = img_to_array(food_image)
 
-    #Normalizing the pixels
+    #Normalizing the pixels in the image to between 0 and 1
     food_image = food_image / 255
 
     food_image = np.expand_dims(food_image, [0])
@@ -77,6 +121,8 @@ def processed_img(img_path) -> str:
 
     #Printing the label from the list
     y = " ".join(str(x) for x in y_class)
+
+    #Indexing the list of labels to retrieve the food 
     y = int(y)
     result = labels[y]
 
@@ -88,11 +134,12 @@ def run():
     """
     This function runs the streamlit server
     """
-    #Defining title
+    #Defining title of the website
     st.title("Eat Right! Fruit and Vegetable Classification Model!")
+    st.image(Image.open(r"C:\Users\jakem\FoodClassification\FOODCLASSIFICATION\upload_images\Untitled design (71).png"))
 
     #Allowing user to upload an image of their fruit or vegetable
-    img_file = st.file_uploader("Choose an Image", type=["jpg", "png"])
+    img_file = st.file_uploader("Upload your Ingredients!", type=["jpg", "png"])
 
     if img_file is not None:
         #Reading in the image
@@ -111,7 +158,6 @@ def run():
         if img_file is not None:
             #Running prediction function on image if valid
             result = processed_img(save_image_path)
-            print(result)
 
             #If the uploaded image is predicted to be a vegetable
             if result in vegetables:
@@ -125,9 +171,14 @@ def run():
             st.success("**The model predicts this is a : " + result + '**')
 
             #Returning the calories of the predicted food label if valid
-            cal = scrape_for_calories(result)
-            if cal:
-                st.warning('**' + cal + ' for a serrving of 100 grams**')
+            cal_pred = scrape_for_calories(result)
+            if cal_pred:
+                st.warning('**' + cal_pred + ' for a serving of 100 grams**')
+            
+            #Returning some fun facts about the predicted food using the GPT-2 model
+            recipes = return_facts(result)
+            if recipes:
+                st.warning('**Fun Facts: ' + recipes + '!**')
 
 
 if __name__ == '__main__':
