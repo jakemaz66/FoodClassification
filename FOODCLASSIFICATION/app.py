@@ -11,7 +11,6 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-
 #Loading Saved models
 model = load_model(r"C:\Users\jakem\OneDrive\Desktop\School\Machine Learning\Final Project\Saved_Model\PretrainedModel2.h5")
 #model2 = load_model(r"C:\Users\jakem\OneDrive\Desktop\School\Machine Learning\Final Project\Saved_Model\CustomModel.h5")
@@ -37,7 +36,6 @@ fruits = ['Apple', 'Banana', 'Bello Pepper', 'Chilli Pepper', 'Grapes', 'Jalepen
 vegetables = ['Beetroot', 'Cabbage', 'Capsicum', 'Carrot', 'Cauliflower', 'Corn', 'Cucumber', 'Eggplant', 'Ginger',
               'Lettuce', 'Onion', 'Peas', 'Potato', 'Raddish', 'Soy Beans', 'Spinach', 'Sweetcorn', 'Sweetpotato',
               'Tomato', 'Turnip']
-
 
 def scrape_for_calories(prediction) -> str:
     """
@@ -80,7 +78,7 @@ def return_facts(prediction):
     model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
 
     #Prompting model with fun facts about predicted food
-    input_text = "Fun facts about the predicted food. " + prediction + "s"
+    input_text = "Fun facts about " + prediction + "s"
     max_length = 110
 
     #Tokenizing input text
@@ -88,7 +86,7 @@ def return_facts(prediction):
 
     input_ids = input_ids['input_ids'].to(device)
 
-    #Generating model output
+    #Generating model output with beam search
     output = model.generate(input_ids, max_length=max_length, num_beams=5,
                         do_sample=False, no_repeat_ngram_size=2)
 
@@ -101,7 +99,6 @@ def processed_img(img_path) -> str:
     This function takes in the path of an image and returns the predicted label of the image
     using a pretrained model
     """
-
     #Loading image of the target size
     food_image = load_img(img_path, target_size=(224, 224, 3))
 
@@ -176,9 +173,9 @@ def run():
                 st.warning('**' + cal_pred + ' for a serving of 100 grams**')
             
             #Returning some fun facts about the predicted food using the GPT-2 model
-            recipes = return_facts(result)
-            if recipes:
-                st.warning('**Fun Facts: ' + recipes + '!**')
+            facts = return_facts(result)
+            if facts:
+                st.warning('**Fun Facts: ' + facts + '!**')
 
 
 if __name__ == '__main__':
