@@ -27,11 +27,11 @@ labels = {0: 'apple', 1: 'banana', 2: 'beetroot',
           24: 'peas', 25: 'pineapple',26: 'pomegranate', 
           27: 'potato', 28: 'raddish', 29: 'soy beans', 
           30: 'spinach', 31: 'sweetcorn',32: 'sweetpotato', 
-          33: 'tomato', 34: 'turnip', 35: 'watermelon'}
+          33: 'tomato', 34: 'turnip', 35: 'watermelon', 36: 'dragon fruit'}
 
 #Creating lists of Fruits and Vegetables the Model was trained on
 fruits = ['Apple', 'Banana', 'Bello Pepper', 'Chilli Pepper', 'Grapes', 'Jalepeno', 'Kiwi', 'Lemon', 'Mango', 'Orange',
-          'Paprika', 'Pear', 'Pineapple', 'Pomegranate', 'Watermelon']
+          'Paprika', 'Pear', 'Pineapple', 'Pomegranate', 'Watermelon', 'dragon fruit']
 
 vegetables = ['Beetroot', 'Cabbage', 'Capsicum', 'Carrot', 'Cauliflower', 'Corn', 'Cucumber', 'Eggplant', 'Ginger',
               'Lettuce', 'Onion', 'Peas', 'Potato', 'Raddish', 'Soy Beans', 'Spinach', 'Sweetcorn', 'Sweetpotato',
@@ -93,7 +93,14 @@ def return_facts(prediction):
     #Returning a decoded version (real words) of output
     return tokenizer.decode(output[0])
 
-   
+def return_recipe(prediction):
+    """
+    This function returns a webpage with recipes for the predicted food
+    """
+    text = f"Here's a great recipe using {prediction}s: https://www.allrecipes.com/search?q={prediction}"
+    return text
+
+
 def processed_img(img_path) -> str:
     """
     This function takes in the path of an image and returns the predicted label of the image
@@ -171,6 +178,10 @@ def run():
             cal_pred = scrape_for_calories(result)
             if cal_pred:
                 st.warning('**' + cal_pred + ' for a serving of 100 grams**')
+
+            recipe = return_recipe(result)
+            if recipe:
+                st.warning(recipe)
             
             #Returning some fun facts about the predicted food using the GPT-2 model
             facts = return_facts(result)
