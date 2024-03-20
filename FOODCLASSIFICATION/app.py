@@ -56,6 +56,7 @@ def scrape_for_calories(prediction) -> str:
         cal = scraper.find("div", class_="BNeawe iBp4i AP7Wnd").text
 
         return cal
+
     
     except Exception as error:
 
@@ -206,5 +207,5 @@ def run():
             facts_placeholder.warning('**Fun Facts: ' + facts + '!**')
 
 
-if __name__ == '__main__':
-    run()
+#if __name__ == '__main__':
+run()
