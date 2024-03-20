@@ -7,6 +7,7 @@ from keras.models import load_model
 import requests
 from bs4 import BeautifulSoup
 from transformers import AutoTokenizer, AutoModelForCausalLM
+import time
 
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -97,7 +98,7 @@ def return_recipe(prediction):
     """
     This function returns a webpage with recipes for the predicted food
     """
-    text = f"Here's a great recipe using {prediction}s: https://www.allrecipes.com/search?q={prediction}"
+    text = f"Here's some great recipes using {prediction}s: https://www.allrecipes.com/search?q={prediction}"
     return text
 
 
@@ -183,10 +184,26 @@ def run():
             if recipe:
                 st.warning(recipe)
             
-            #Returning some fun facts about the predicted food using the GPT-2 model
+            progress_text = "Operation in progress. Please wait."
+            progress_bar = st.progress(0)
+
+            progress_placeholder = st.empty()
+            loading_text = progress_placeholder.text(progress_text)
+
+            for percent_complete in range(100):
+                time.sleep(0.03)  
+                progress_bar.progress(percent_complete + 1)
+                loading_text.text(f"{progress_text} ({percent_complete + 1}% complete)")
+
+            loading_text.text("Loading fun facts...")  
+            facts_placeholder = st.empty()  
+
+      
+            time.sleep(2)  
+            progress_bar.empty()
             facts = return_facts(result)
-            if facts:
-                st.warning('**Fun Facts: ' + facts + '!**')
+
+            facts_placeholder.warning('**Fun Facts: ' + facts + '!**')
 
 
 if __name__ == '__main__':
