@@ -184,6 +184,7 @@ def run():
             if recipe:
                 st.warning(recipe)
             
+            #Adding a Progress Bar
             progress_text = "Operation in progress. Please wait."
             progress_bar = st.progress(0)
 
