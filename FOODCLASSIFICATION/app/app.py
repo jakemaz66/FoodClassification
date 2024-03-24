@@ -141,7 +141,7 @@ def run():
     """
     #Defining title of the website
     st.title("Eat Right! Fruit and Vegetable Classification Model!")
-    st.image(Image.open(r"C:\Users\jakem\FoodClassification\FOODCLASSIFICATION\upload_images\Untitled design (71).png"))
+    st.image(Image.open('FOODCLASSIFICATION/app/upload_images/Untitled design (71).png'))
 
     #Allowing user to upload an image of their fruit or vegetable
     img_file = st.file_uploader("Upload your Ingredients!", type=["jpg", "png"])
@@ -154,7 +154,7 @@ def run():
         st.image(img, use_column_width=False)
 
         #Saving file path of uploaded image
-        save_image_path = r'C:\Users\jakem\FoodClassification\FOODCLASSIFICATION\upload_images' + img_file.name 
+        save_image_path = 'FOODCLASSIFICATION/app/upload_images/' + img_file.name 
 
         #Saving image to new path
         with open(save_image_path, "wb") as f:
