@@ -12,7 +12,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 #Loading Saved models
-model = load_model(r"FOODCLASSIFICATION\app\PretrainedModel2.h5")
+model = load_model("FOODCLASSIFICATION/app/PretrainedModel2.h5")
 #model2 = load_model(r"C:\Users\jakem\OneDrive\Desktop\School\Machine Learning\Final Project\Saved_Model\CustomModel.h5")
 
 #Defining Labels for Food in a Dictionary
