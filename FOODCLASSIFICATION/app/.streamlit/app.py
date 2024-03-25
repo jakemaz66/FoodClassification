@@ -139,8 +139,10 @@ def run():
     """
     This function runs the streamlit server
     """
+    
     #Defining title of the website
     st.title("Eat Right! Fruit and Vegetable Classification Model!")
+
     st.image(Image.open('FOODCLASSIFICATION/app/upload_images/Untitled design (71).png'))
 
     #Allowing user to upload an image of their fruit or vegetable

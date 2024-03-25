@@ -1,0 +1,16 @@
+[server]
+port = 8501
+
+[general]
+# Page configuration
+title = "Food Classifier"
+icon = "FOODCLASSIFICATION/app/upload_images/Untitled design (88).png"  # Path to the icon file
+layout = "wide"  
+initial_sidebar_state = "expanded"  
+
+[theme]
+# Theme customization
+primaryColor = "#008080"  
+backgroundColor = "#8c92ac"  
+textColor = "#262730" 
+font = "sans-serif"  
