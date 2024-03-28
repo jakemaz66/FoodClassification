@@ -12,7 +12,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 #Loading Saved models
-model = load_model("FOODCLASSIFICATION/app/PretrainedModel2.h5")
+model = load_model("app/PretrainedModel2.h5")
 #model2 = load_model(r"C:\Users\jakem\OneDrive\Desktop\School\Machine Learning\Final Project\Saved_Model\CustomModel.h5")
 
 #Defining Labels for Food in a Dictionary
@@ -143,7 +143,7 @@ def run():
     #Defining title of the website
     st.title("Eat Right! Fruit and Vegetable Classification Model!")
 
-    st.image(Image.open('FOODCLASSIFICATION/app/upload_images/Untitled design (71).png'))
+    st.image(Image.open('app/upload_images/Untitled design (71).png'))
 
     #Allowing user to upload an image of their fruit or vegetable
     img_file = st.file_uploader("Upload your Ingredients!", type=["jpg", "png"])
@@ -156,7 +156,7 @@ def run():
         st.image(img, use_column_width=False)
 
         #Saving file path of uploaded image
-        save_image_path = 'FOODCLASSIFICATION/app/upload_images/' + img_file.name 
+        save_image_path = 'app/upload_images/' + img_file.name 
 
         #Saving image to new path
         with open(save_image_path, "wb") as f:
