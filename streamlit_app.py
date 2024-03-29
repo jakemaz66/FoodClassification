@@ -19,19 +19,19 @@ model = load_model("app/PretrainedModel2.h5")
 labels = {0: 'apple', 1: 'banana', 2: 'beetroot', 
           3: 'bell pepper', 4: 'cabbage', 5: 'capsicum', 
           6: 'carrot', 7: 'cauliflower', 8: 'chilli pepper', 
-          9: 'corn', 10: 'cucumber', 11: 'eggplant', 
-          12: 'garlic', 13: 'ginger',14: 'grapes', 
-          15: 'jalepeno', 16: 'kiwi', 17: 'lemon', 
-          18: 'lettuce',19: 'mango', 20: 'onion', 
-          21: 'orange', 22: 'paprika', 23: 'pear', 
-          24: 'peas', 25: 'pineapple',26: 'pomegranate', 
-          27: 'potato', 28: 'raddish', 29: 'soy beans', 
-          30: 'spinach', 31: 'sweetcorn',32: 'sweetpotato', 
-          33: 'tomato', 34: 'turnip', 35: 'watermelon', 36: 'dragon fruit'}
+          9: 'corn', 10: 'cucumber', 11: 'dragon fruit', 12: 'eggplant', 
+          13: 'garlic', 14: 'ginger',15: 'grapes', 
+          16: 'jalepeno', 17: 'kiwi', 18: 'lemon', 
+          19: 'lettuce',20: 'mango', 21: 'onion', 
+          22: 'orange', 23: 'paprika', 24: 'pear', 
+          25: 'peas', 26: 'pineapple',27: 'pomegranate', 
+          28: 'potato', 29: 'raddish', 30: 'soy beans', 
+          31: 'spinach', 32: 'sweetcorn',33: 'sweetpotato', 
+          34: 'tomato', 35: 'turnip', 36: 'watermelon'}
 
 #Creating lists of Fruits and Vegetables the Model was trained on
-fruits = ['Apple', 'Banana', 'Bello Pepper', 'Chilli Pepper', 'Grapes', 'Jalepeno', 'Kiwi', 'Lemon', 'Mango', 'Orange',
-          'Paprika', 'Pear', 'Pineapple', 'Pomegranate', 'Watermelon', 'dragon fruit']
+fruits = ['Apple', 'Banana', 'Bell Pepper', 'Chilli Pepper', 'Dragon Fruit', 'Grapes', 'Jalepeno', 'Kiwi', 'Lemon', 'Mango', 'Orange',
+          'Paprika', 'Pear', 'Pineapple', 'Pomegranate', 'Watermelon']
 
 vegetables = ['Beetroot', 'Cabbage', 'Capsicum', 'Carrot', 'Cauliflower', 'Corn', 'Cucumber', 'Eggplant', 'Ginger',
               'Lettuce', 'Onion', 'Peas', 'Potato', 'Raddish', 'Soy Beans', 'Spinach', 'Sweetcorn', 'Sweetpotato',
@@ -143,7 +143,7 @@ def run():
     #Defining title of the website
     st.title("Eat Right! Fruit and Vegetable Classification Model!")
 
-    st.image(Image.open('app/upload_images/Untitled design (71).png'))
+    st.image(Image.open('app/upload_images/Untitled design (99).png'), caption='We use neural nets to power this app!')
 
     #Allowing user to upload an image of their fruit or vegetable
     img_file = st.file_uploader("Upload your Ingredients!", type=["jpg", "png"])
@@ -194,7 +194,7 @@ def run():
             loading_text = progress_placeholder.text(progress_text)
 
             for percent_complete in range(100):
-                time.sleep(0.03)  
+                time.sleep(0.02)  
                 progress_bar.progress(percent_complete + 1)
                 loading_text.text(f"{progress_text} ({percent_complete + 1}% complete)")
 
