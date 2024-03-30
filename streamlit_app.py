@@ -102,7 +102,9 @@ def return_facts(prediction, input_prompt):
                             no_repeat_ngram_size=2,
                             max_new_tokens=40,
                             do_sample=True,
-                            top_k=50
+                            top_k=50,
+                            early_stopping=True,  
+                            stopping_token=tokenizer.convert_tokens_to_ids(['.', '?', '!'])[0]
     )
 
     #Returning a decoded version (real words) of output
