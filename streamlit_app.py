@@ -9,7 +9,9 @@ from bs4 import BeautifulSoup
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import time
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import (AutoTokenizer, AutoModelForCausalLM, GPT2Tokenizer, DataCollatorForLanguageModeling, TextDataset, 
+                          GPT2LMHeadModel, TrainingArguments, Trainer, pipeline)
+
 
 #Loading Saved models
 model = load_model("app/PretrainedModel2.h5")
@@ -63,7 +65,7 @@ def scrape_for_calories(prediction) -> str:
         st.error("Was not able to detect the calories for this item, eat with caution!")
         print(error)
 
-def return_facts(prediction):
+def return_facts(prediction, input_prompt):
     """
     This functions uses a huggingface model to return facts for the predicted food
     """
@@ -79,17 +81,29 @@ def return_facts(prediction):
     model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
 
     #Prompting model with fun facts about predicted food
-    input_text = "Fun facts about " + prediction + "s"
-    max_length = 110
+    input_text = input_prompt
+    #force_words = [prediction]
+    max_length = 60
 
     #Tokenizing input text
     input_ids = tokenizer(input_text, return_tensors="pt")
+    #force_words_ids = tokenizer(force_words,return_tensors="pt")
 
     input_ids = input_ids['input_ids'].to(device)
+    #force_words_ids = force_words_ids['force_words_ids'].to(device)
+
 
     #Generating model output with beam search
-    output = model.generate(input_ids, max_length=max_length, num_beams=5,
-                        do_sample=False, no_repeat_ngram_size=2)
+    output = model.generate(input_ids,
+                            #force_words_ids=force_words_ids,
+                            max_length=max_length, 
+                            num_beams=10,
+                            num_return_sequences=10, 
+                            no_repeat_ngram_size=2,
+                            max_new_tokens=40,
+                            do_sample=True,
+                            top_k=50
+    )
 
     #Returning a decoded version (real words) of output
     return tokenizer.decode(output[0])
@@ -185,28 +199,20 @@ def run():
             recipe = return_recipe(result)
             if recipe:
                 st.warning(recipe)
-            
-            #Adding a Progress Bar
-            progress_text = "Operation in progress. Please wait."
-            progress_bar = st.progress(0)
 
-            progress_placeholder = st.empty()
-            loading_text = progress_placeholder.text(progress_text)
 
-            for percent_complete in range(100):
-                time.sleep(0.02)  
-                progress_bar.progress(percent_complete + 1)
-                loading_text.text(f"{progress_text} ({percent_complete + 1}% complete)")
+            huggingface_input = st.text_input("Start a Conversation about " + result +"!")
 
-            loading_text.text("Loading fun facts...")  
-            facts_placeholder = st.empty()  
+            length = True
 
-      
-            time.sleep(2)  
-            progress_bar.empty()
-            facts = return_facts(result)
+            if len(huggingface_input) > 50:
+                st.warning('Try a Shorter Prompt!')
 
-            facts_placeholder.warning('**Fun Facts: ' + facts + '!**')
+                length = False
+
+            elif huggingface_input and length == True:
+                facts = return_facts(result, huggingface_input)
+                st.warning(facts)
 
 
 #if __name__ == '__main__':
