@@ -136,12 +136,18 @@ def processed_img(img_path) -> str:
     #Storing answer as most probable prediction
     y_class = pred.argmax(axis=-1)
 
+    #Getting confidence of prediction
+    max_confidence = pred.max()
+
     #Printing the label from the list
     y = " ".join(str(x) for x in y_class)
 
     #Indexing the list of labels to retrieve the food 
     y = int(y)
     result = labels[y]
+
+    if max_confidence < 0.6:
+        return "I'm sorry, I don't recognize this as a food"
 
     #Returning label 
     return result.capitalize()
@@ -182,8 +188,11 @@ def run():
                 st.info('**This image is a vegetable!**')
             
             #If uploaded image predicted to be a fruit
-            else:
+            elif result in fruits:
                 st.info('**This image is a fruit!**')
+
+            else:
+                st.info('I cannot recognize this food')
 
             #Using Streamlit success method
             st.success("**The model predicts this is a : " + result + '**')
@@ -193,21 +202,26 @@ def run():
             if cal_pred:
                 st.warning('**' + cal_pred + ' for a serving of 100 grams**')
 
-            recipe = return_recipe(result)
-            if recipe:
-                st.warning(recipe)
+            if result in fruits or result in vegetables:
+                recipe = return_recipe(result)
+                if recipe:
+                    st.warning(recipe)
+            else:
+                st.warning('Cannot find recipes for this food')
 
-            huggingface_input = st.text_input("Start a Conversation about " + result +"!")
-            length = True
             
-            #Putting constraint on length of input text
-            if len(huggingface_input) > 50:
-                st.warning('Try a Shorter Prompt!')
-                length = False
+            if result in fruits or result in vegetables:
+                huggingface_input = st.text_input("Start a Conversation about " + result +"!")
+                length = True
+                
+                #Putting constraint on length of input text
+                if len(huggingface_input) > 50:
+                    st.warning('Try a Shorter Prompt!')
+                    length = False
 
-            elif huggingface_input and length == True:
-                text = generate_text(result, huggingface_input)
-                st.warning(text)
+                elif huggingface_input and length == True:
+                    text = generate_text(result, huggingface_input)
+                    st.warning(text)
 
 
 if __name__ == '__main__':
