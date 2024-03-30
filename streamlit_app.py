@@ -55,23 +55,21 @@ def scrape_for_calories(prediction) -> str:
         scraper = BeautifulSoup(text, 'html.parser')
 
         cal = scraper.find("div", class_="BNeawe iBp4i AP7Wnd").text
-
         return cal
 
-    
     except Exception as error:
 
         #Returning error message from streamlit if it cannot find
         st.error("Was not able to detect the calories for this item, eat with caution!")
         print(error)
 
-def return_facts(prediction, input_prompt):
+
+def generate_text(input_prompt):
     """
-    This functions uses a huggingface model to return facts for the predicted food
+    This functions uses a huggingface model to generate conversational text about the predicted food
     """
     #Checking if GPU compatiable device available
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    device
 
     #Loading in pretrained gpt 2 model from huggingface
     model_name = "gpt2-large"
@@ -92,7 +90,6 @@ def return_facts(prediction, input_prompt):
     input_ids = input_ids['input_ids'].to(device)
     #force_words_ids = force_words_ids['force_words_ids'].to(device)
 
-
     #Generating model output with beam search
     output = model.generate(input_ids,
                             #force_words_ids=force_words_ids,
@@ -100,15 +97,15 @@ def return_facts(prediction, input_prompt):
                             num_beams=10,
                             num_return_sequences=10, 
                             no_repeat_ngram_size=2,
-                            max_new_tokens=40,
+                            max_new_tokens=60,
                             do_sample=True,
                             top_k=50,
-                            early_stopping=True,  
-                            stopping_token=tokenizer.convert_tokens_to_ids(['.', '?', '!'])[0]
+                            early_stopping=True
     )
 
     #Returning a decoded version (real words) of output
     return tokenizer.decode(output[0])
+
 
 def return_recipe(prediction):
     """
@@ -131,7 +128,6 @@ def processed_img(img_path) -> str:
 
     #Normalizing the pixels in the image to between 0 and 1
     food_image = food_image / 255
-
     food_image = np.expand_dims(food_image, [0])
 
     #Predicting the image class using the given model
@@ -158,7 +154,6 @@ def run():
     
     #Defining title of the website
     st.title("Eat Right! Fruit and Vegetable Classification Model!")
-
     st.image(Image.open('app/upload_images/Untitled design (99).png'), caption='We use neural nets to power this app!')
 
     #Allowing user to upload an image of their fruit or vegetable
@@ -202,20 +197,18 @@ def run():
             if recipe:
                 st.warning(recipe)
 
-
             huggingface_input = st.text_input("Start a Conversation about " + result +"!")
-
             length = True
-
+            
+            #Putting constraint on length of input text
             if len(huggingface_input) > 50:
                 st.warning('Try a Shorter Prompt!')
-
                 length = False
 
             elif huggingface_input and length == True:
-                facts = return_facts(result, huggingface_input)
-                st.warning(facts)
+                text = generate_text(result, huggingface_input)
+                st.warning(text)
 
 
-#if __name__ == '__main__':
-run()
+if __name__ == '__main__':
+    run()
