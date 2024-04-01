@@ -146,7 +146,7 @@ def processed_img(img_path) -> str:
     y = int(y)
     result = labels[y]
 
-    if max_confidence < 0.6:
+    if max_confidence < 0.5:
         return "I'm sorry, I don't recognize this as a food"
 
     #Returning label 
@@ -157,72 +157,101 @@ def run():
     """
     This function runs the streamlit server
     """
-    
-    #Defining title of the website
-    st.title("Eat Right! Fruit and Vegetable Classification Model!")
-    st.image(Image.open('app/upload_images/Untitled design (99).png'), caption='We use neural nets to power this app!')
+    # Create a sidebar menu
+    menu = st.sidebar.radio('Navigation', ['Home', 'Docs'])
 
-    #Allowing user to upload an image of their fruit or vegetable
-    img_file = st.file_uploader("Upload your Ingredients!", type=["jpg", "png"])
+    if menu == 'Home':
 
-    if img_file is not None:
-        #Reading in the image
-        img = Image.open(img_file).resize((250, 250))
+        #Defining title of the website
+        st.title("Eat Right! Fruit and Vegetable Classification Model!")
+        st.image(Image.open('app/upload_images/Untitled design - 2024-04-01T065557.621.png'), caption='We use neural nets to power this app!')
 
-        #Displaying the image in streamlit app
-        st.image(img, use_column_width=False)
-
-        #Saving file path of uploaded image
-        save_image_path = 'app/upload_images/' + img_file.name 
-
-        #Saving image to new path
-        with open(save_image_path, "wb") as f:
-            f.write(img_file.getbuffer())
+        #Allowing user to upload an image of their fruit or vegetable
+        img_file = st.file_uploader("Upload your Ingredients!", type=["jpg", "png"])
 
         if img_file is not None:
-            #Running prediction function on image if valid
-            result = processed_img(save_image_path)
+            #Reading in the image
+            img = Image.open(img_file).resize((250, 250))
 
-            #If the uploaded image is predicted to be a vegetable
-            if result in vegetables:
-                st.info('**This image is a vegetable!**')
-            
-            #If uploaded image predicted to be a fruit
-            elif result in fruits:
-                st.info('**This image is a fruit!**')
+            #Displaying the image in streamlit app
+            st.image(img, use_column_width=False)
 
-            else:
-                st.info('I cannot recognize this food')
+            #Saving file path of uploaded image
+            save_image_path = 'app/upload_images/' + img_file.name 
 
-            #Using Streamlit success method
-            st.success("**The model predicts this is a : " + result + '**')
+            #Saving image to new path
+            with open(save_image_path, "wb") as f:
+                f.write(img_file.getbuffer())
 
-            #Returning the calories of the predicted food label if valid
-            cal_pred = scrape_for_calories(result)
-            if cal_pred:
-                st.warning('**' + cal_pred + ' for a serving of 100 grams**')
+            if img_file is not None:
+                #Running prediction function on image if valid
+                result = processed_img(save_image_path)
 
-            if result in fruits or result in vegetables:
-                recipe = return_recipe(result)
-                if recipe:
-                    st.warning(recipe)
-            else:
-                st.warning('Cannot find recipes for this food')
-
-            
-            if result in fruits or result in vegetables:
-                huggingface_input = st.text_input("Start a Conversation about " + result +"!")
-                length = True
+                #If the uploaded image is predicted to be a vegetable
+                if result in vegetables:
+                    st.info('**This image is a vegetable!**')
                 
-                #Putting constraint on length of input text
-                if len(huggingface_input) > 50:
-                    st.warning('Try a Shorter Prompt!')
-                    length = False
+                #If uploaded image predicted to be a fruit
+                elif result in fruits:
+                    st.info('**This image is a fruit!**')
 
-                elif huggingface_input and length == True:
-                    text = generate_text(result, huggingface_input)
-                    st.warning(text)
+                else:
+                    st.info('I cannot recognize this food')
 
+                #Using Streamlit success method
+                st.success("**The model predicts this is a : " + result + '**')
+
+                #Returning the calories of the predicted food label if valid
+                cal_pred = scrape_for_calories(result)
+                if cal_pred:
+                    st.warning('**' + cal_pred + ' for a serving of 100 grams**')
+
+                if result in fruits or result in vegetables:
+                    recipe = return_recipe(result)
+                    if recipe:
+                        st.warning(recipe)
+                else:
+                    st.warning('Cannot find recipes for this food')
+
+                
+                if result in fruits or result in vegetables:
+                    huggingface_input = st.text_input("Start a Conversation about " + result +"!")
+                    length = True
+                    
+                    #Putting constraint on length of input text
+                    if len(huggingface_input) > 50:
+                        st.warning('Try a Shorter Prompt!')
+                        length = False
+
+                    elif huggingface_input and length == True:
+                        text = generate_text(result, huggingface_input)
+                        st.warning(text)
+
+    else:
+        st.title('How to Use my APP')
+        st.markdown("""
+        ## How the App Works
+
+        This app can help you make healthier food choices by giving you the nutrition content, relevant recipes, 
+        and information about ingredients you may have on hand. Here's some functions of the app:
+
+        1. First, take a picture of an ingredient you have. Make sure the photo is high resolution and the ingredient is the
+           primary focus of the image.
+        2. Next, upload your image using the button the the application
+        3. Our fine-tuned neural network will predict the fruit/vegetable and classify it
+        4. Our app will then return the calories for a 100 gram serving, and provide a link to recipes
+           at AllRecipes.com
+        5. Finally, using a GPT-2 model fine-tuned with beam-search and top-k sampling, you can ask
+           questions about your food to a chatbot. Good questions to ask are things like the vitamins in the food,
+           creative ways to use it, or fun facts about the ingredient. NOTE: prompts to the chatbot
+           are currently limited to 50 characters or less!
+
+
+        Please enjoy my food classification app!
+                    
+        For any questions contact Mazurkiewiczj@duq.edu
+        """)
+    
 
 if __name__ == '__main__':
     run()
