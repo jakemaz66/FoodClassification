@@ -1,5 +1,6 @@
 import streamlit as st
 from PIL import Image
+import re
 from keras.preprocessing.image import load_img, img_to_array
 import tensorflow as tf
 import numpy as np
@@ -72,7 +73,7 @@ def generate_text(input_prompt):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     #Loading in pretrained gpt 2 model from huggingface
-    model_name = "gpt2-large"
+    model_name = "gpt2"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     #Transporting model to device
@@ -104,7 +105,15 @@ def generate_text(input_prompt):
     )
 
     #Returning a decoded version (real words) of output
-    return tokenizer.decode(output[0])
+    output =  tokenizer.decode(output[0])
+
+    sentences = re.split(r'(?<=[.!?]) +', output)
+    final_output = ""
+    for sentence in sentences:
+        if sentence.strip() and any(c in sentence for c in (".", "!", "?")):
+            final_output += sentence + " "
+
+    return final_output
 
 
 def return_recipe(prediction):
@@ -146,6 +155,7 @@ def processed_img(img_path) -> str:
     y = int(y)
     result = labels[y]
 
+    #Setting a threshold for food confidence to reject non-food images 
     if max_confidence < 0.5:
         return "I'm sorry, I don't recognize this as a food"
 
@@ -213,9 +223,10 @@ def run():
                 else:
                     st.warning('Cannot find recipes for this food')
 
-                
+                st.warning("This language model may be subject to incorrect output, please consider its output with caution")
                 if result in fruits or result in vegetables:
                     huggingface_input = st.text_input("Start a Conversation about " + result +"!")
+
                     length = True
                     
                     #Putting constraint on length of input text
@@ -224,7 +235,7 @@ def run():
                         length = False
 
                     elif huggingface_input and length == True:
-                        text = generate_text(result, huggingface_input)
+                        text = generate_text(huggingface_input)
                         st.warning(text)
 
     else:
