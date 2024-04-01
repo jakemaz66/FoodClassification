@@ -228,7 +228,7 @@ def run():
                         st.warning(text)
 
     else:
-        st.title('How to Use my APP')
+        st.title('How to Use my App')
         st.markdown("""
         ## How the App Works
 
@@ -237,14 +237,14 @@ def run():
 
         1. First, take a picture of an ingredient you have. Make sure the photo is high resolution and the ingredient is the
            primary focus of the image.
-        2. Next, upload your image using the button the the application
-        3. Our fine-tuned neural network will predict the fruit/vegetable and classify it
+        2. Next, upload your image using the button within the application.
+        3. Our fine-tuned neural network will predict the fruit/vegetable and classify it into a category.
         4. Our app will then return the calories for a 100 gram serving, and provide a link to recipes
-           at AllRecipes.com
+           at https://www.allrecipes.com/
         5. Finally, using a GPT-2 model fine-tuned with beam-search and top-k sampling, you can ask
-           questions about your food to a chatbot. Good questions to ask are things like the vitamins in the food,
-           creative ways to use it, or fun facts about the ingredient. NOTE: prompts to the chatbot
-           are currently limited to 50 characters or less!
+           questions about your food to a chatbot. Good questions to ask are things like the 
+           vitamin breakdown in the food, creative ways to use it, or fun facts about the ingredient. 
+           NOTE: Prompts to the chatbot are currently limited to 50 characters or less!
 
 
         Please enjoy my food classification app!
