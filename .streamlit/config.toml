@@ -5,5 +5,3 @@ secondaryBackgroundColor="#d0d2ff"
 textColor = "#000000"
 font = "serif"
 
-[server]
-baseUrlPath = "machinelearningfoodclassification_jnm"
