@@ -42,24 +42,50 @@ def scrape_for_calories(prediction) -> str:
     """
     This functions scrapes the web to find the calories of a passed in image
     """
-
     try:
-        #Googling the calories in the passed in food, storing as a URL
-        url_for_search = 'https://www.google.com/search?&q=calories in ' + prediction
+            #Googling the calories in the passed in food, storing as a URL
+            url_for_search = 'https://www.google.com/search?&q=calories in ' + prediction
+            url_for_search_2 = 'https://www.google.com/search?&q=protein in ' + prediction
 
-        #Retrieving the text from the URL
-        text = requests.get(url_for_search).text
+            #Retrieving the text from the URL
+            text = requests.get(url_for_search).text
+            text2 = requests.get(url_for_search_2).text
 
-        #Using the Beautiful Soup Web Scraper to parse the HTML and store in calories variable
-        scraper = BeautifulSoup(text, 'html.parser')
+            #Using the Beautiful Soup Web Scraper to parse the HTML and store in calories variable
+            scraper = BeautifulSoup(text, 'html.parser')
 
-        cal = scraper.find("div", class_="BNeawe iBp4i AP7Wnd").text
-        return cal
+            cal = scraper.find("div", class_="BNeawe iBp4i AP7Wnd").text
 
+            return cal
+    
     except Exception as error:
 
         #Returning error message from streamlit if it cannot find
         st.error("Was not able to detect the calories for this item, eat with caution!")
+        print(error)
+    
+def scrape_for_protein(prediction) -> str:
+    """
+    This functions scrapes the web to find the calories of a passed in image
+    """
+
+    try:
+        #Googling the calories in the passed in food, storing as a URL
+        url_for_search_2 = 'https://www.google.com/search?&q=protein in ' + prediction
+
+        #Retrieving the text from the URL
+        text2 = requests.get(url_for_search_2).text
+
+        #Using the Beautiful Soup Web Scraper to parse the HTML and store in calories variable
+        scraper = BeautifulSoup(text2, 'html.parser')
+        protein = scraper.find("div", class_="BNeawe iBp4i AP7Wnd").text
+
+        return protein
+
+    except Exception as error:
+
+        #Returning error message from streamlit if it cannot find
+        st.error("Was not able to detect the protein for this item, eat with caution!")
         print(error)
 
 
@@ -97,7 +123,6 @@ def generate_text(input_prompt):
                             num_return_sequences=10, 
                             no_repeat_ngram_size=2,
                             max_new_tokens=60,
-                            temperature=0.8,
                             do_sample=True,
                             top_k=50,
                             early_stopping=True
@@ -122,6 +147,12 @@ def return_recipe(prediction):
     text = f"Here's some great recipes using {prediction}s: https://www.allrecipes.com/search?q={prediction}"
     return text
 
+def return_nutrition(prediction):
+    """
+    This function returns a webpage with nutrition for the predicted food
+    """
+    text = f"Here's the complete nutrition breakdown of {prediction}s: https://www.nutritionix.com/search?q={prediction}"
+    return text
 
 def processed_img(img_path) -> str:
     """
@@ -214,13 +245,25 @@ def run():
                 cal_pred = scrape_for_calories(result)
                 if cal_pred:
                     st.warning('**' + cal_pred + ' for a serving of 100 grams**')
+                
+                protein_pred = scrape_for_protein(result)
+                if cal_pred:
+                    st.warning('**' + protein_pred + ' of protein for a serving of 100 grams**')
+
+                if result in fruits or result in vegetables:
+                    nutrition = return_nutrition(result)
+                    if nutrition:
+                        st.warning(nutrition)
+                else:
+                    st.warning('Cannot find nutrition breakdown for this food')
+
 
                 if result in fruits or result in vegetables:
                     recipe = return_recipe(result)
                     if recipe:
                         st.warning(recipe)
                 else:
-                    st.warning('Cannot find recipes for this food')
+                    st.warning('Cannot find recipes for this food')      
 
                 st.warning("This language model may be subject to incorrect output, please consider its output with caution")
                 if result in fruits or result in vegetables:
