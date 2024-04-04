@@ -8,10 +8,8 @@ from keras.models import load_model
 import requests
 from bs4 import BeautifulSoup
 from transformers import AutoTokenizer, AutoModelForCausalLM
-import time
 import torch
-from transformers import (AutoTokenizer, AutoModelForCausalLM, GPT2Tokenizer, DataCollatorForLanguageModeling, TextDataset, 
-                          GPT2LMHeadModel, TrainingArguments, Trainer, pipeline)
+from transformers import (AutoTokenizer, AutoModelForCausalLM)
 
 
 #Loading Saved models
@@ -99,6 +97,7 @@ def generate_text(input_prompt):
                             num_return_sequences=10, 
                             no_repeat_ngram_size=2,
                             max_new_tokens=60,
+                            temperature=0.8,
                             do_sample=True,
                             top_k=50,
                             early_stopping=True
@@ -231,7 +230,7 @@ def run():
                     
                     #Putting constraint on length of input text
                     if len(huggingface_input) > 50:
-                        st.warning('Try a Shorter Prompt!')
+                        st.warning('Prompts limited to 50 characters, Try a Shorter Prompt!')
                         length = False
 
                     elif huggingface_input and length == True:
@@ -239,28 +238,32 @@ def run():
                         st.warning(text)
 
     else:
+        #Defining the Documentation Page
+
         st.title('How to Use my App')
         st.markdown("""
         ## How the App Works
 
         This app can help you make healthier food choices by giving you the nutrition content, relevant recipes, 
-        and information about ingredients you may have on hand. Here's some functions of the app:
+        and information about ingredients you have on hand, all from a simple photo! Here's some functions of the app:
 
-        1. First, take a picture of an ingredient you have. Make sure the photo is high resolution and the ingredient is the
-           primary focus of the image.
-        2. Next, upload your image using the button within the application.
-        3. Our fine-tuned neural network will predict the fruit/vegetable and classify it into a category.
-        4. Our app will then return the calories for a 100 gram serving, and provide a link to recipes
+        1. First, take a picture of a fruit or vegetable you have. Make sure the photo is high resolution and the ingredient is the
+           primary focus of the image. The model currently supports 37 different fruits and vegetables. If your ingredient is
+           not recognized, the model will display a message informing that it cannot recognize the food.
+        2. Next, upload your image using the upload button within the application. Images should be in png or jpeg format.
+        3. Then, Our fine-tuned neural network will predict the fruit/vegetable from your image and classify it into a category.
+        4. Our app will then return the calories for a 100 gram serving of the prediction, and provide a link to recipes
            at https://www.allrecipes.com/
         5. Finally, using a GPT-2 model fine-tuned with beam-search and top-k sampling, you can ask
            questions about your food to a chatbot. Good questions to ask are things like the 
-           vitamin breakdown in the food, creative ways to use it, or fun facts about the ingredient. 
-           NOTE: Prompts to the chatbot are currently limited to 50 characters or less!
+           vitamin breakdown in the food, creative ways to use it in cooking, or fun facts about the ingredient. 
+           NOTE: Prompts to the chatbot are currently limited to 50 characters or less! The responses from the chatbot
+                 may be subject to non-factual remarks as well, so please proceed with caution!
 
 
         Please enjoy my food classification app!
                     
-        For any questions contact Mazurkiewiczj@duq.edu
+        For any questions you can contact me here: Mazurkiewiczj@duq.edu
         """)
     
 
