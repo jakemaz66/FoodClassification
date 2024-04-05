@@ -9,10 +9,14 @@ This project aims to develop a computer vision application that can scan images,
 - TensorFlow
 - Kaggle Food Recognition Challenge Dataset
 - Beautiful Soup Web Scraper
-- HuggingFace (potentially for recipe recommendations)
+- HuggingFace 
 
 ## Deep Learning Model
 The model uses the MobileNet_V2 architecture to identify food within the images. This was the best perfomring model out of 3 attempted ones. The model was trained on 50 epochs of the collected training data and achieved an accuracy of over 98%. If the confidence of the model is below 50% for any given prediction, it will return an error indicating that it cannot recognize the food within the image.
+
+## Data
+Data for the model was achived via webscraping by Beautiful soup for images of fruits and vegetables, but also augemented using the Fruits and Vegetables Image Recognition Dataset (kaggle.com)
+(https://github.com/jakemaz66/FoodClassification/assets/133889822/75915eaf-dc9f-4213-bb04-e22b371220ad)
 
 ## Nutritional Information
 Nutritional information for identified food items is returned via a search query from nutrionix.com and reuturned in a streamlit text field as a hyperlink
