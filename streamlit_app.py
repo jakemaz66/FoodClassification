@@ -30,7 +30,7 @@ labels = {0: 'apple', 1: 'banana', 2: 'beetroot',
           31: 'spinach', 32: 'sweetcorn',33: 'sweetpotato', 
           34: 'tomato', 35: 'turnip', 36: 'watermelon'}
 
-#Creating lists of Fruits and Vegetables the Model was trained on
+#Creating lists of Fruits and Vegetables the Model was trained on to predict food category
 fruits = ['Apple', 'Banana', 'Bell Pepper', 'Chilli Pepper', 'Dragon Fruit', 'Grapes', 'Jalepeno', 'Kiwi', 'Lemon', 'Mango', 'Orange',
           'Paprika', 'Pear', 'Pineapple', 'Pomegranate', 'Watermelon']
 
@@ -40,35 +40,31 @@ vegetables = ['Beetroot', 'Cabbage', 'Capsicum', 'Carrot', 'Cauliflower', 'Corn'
 
 def scrape_for_calories(prediction) -> str:
     """
-    This functions scrapes the web to find the calories of a passed in image
+    This functions scrapes the web to find the calories of tge predicted food 
     """
     try:
             #Googling the calories in the passed in food, storing as a URL
             url_for_search = 'https://www.google.com/search?&q=calories in ' + prediction
-            url_for_search_2 = 'https://www.google.com/search?&q=protein in ' + prediction
 
             #Retrieving the text from the URL
             text = requests.get(url_for_search).text
-            text2 = requests.get(url_for_search_2).text
 
             #Using the Beautiful Soup Web Scraper to parse the HTML and store in calories variable
             scraper = BeautifulSoup(text, 'html.parser')
-
             cal = scraper.find("div", class_="BNeawe iBp4i AP7Wnd").text
 
             return cal
     
     except Exception as error:
-
         #Returning error message from streamlit if it cannot find
         st.error("Was not able to detect the calories for this item, eat with caution!")
         print(error)
     
+
 def scrape_for_protein(prediction) -> str:
     """
-    This functions scrapes the web to find the calories of a passed in image
+    This functions scrapes the web to find the protein of a passed in image
     """
-
     try:
         #Googling the calories in the passed in food, storing as a URL
         url_for_search_2 = 'https://www.google.com/search?&q=protein in ' + prediction
@@ -83,10 +79,10 @@ def scrape_for_protein(prediction) -> str:
         return protein
 
     except Exception as error:
-
         #Returning error message from streamlit if it cannot find
         st.error("Was not able to detect the protein for this item, eat with caution!")
         print(error)
+
 
 
 def generate_text(input_prompt):
@@ -97,7 +93,7 @@ def generate_text(input_prompt):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     #Loading in pretrained gpt 2 model from huggingface
-    model_name = "gpt2"
+    model_name = "gpt2-large"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     #Transporting model to device
@@ -115,7 +111,7 @@ def generate_text(input_prompt):
     input_ids = input_ids['input_ids'].to(device)
     #force_words_ids = force_words_ids['force_words_ids'].to(device)
 
-    #Generating model output with beam search
+    #Generating model output with beam search and top k sampling
     output = model.generate(input_ids,
                             #force_words_ids=force_words_ids,
                             max_length=max_length, 
@@ -131,6 +127,7 @@ def generate_text(input_prompt):
     #Returning a decoded version (real words) of output
     output =  tokenizer.decode(output[0])
 
+    #Ensuring that the final output ends at a punctuation mark
     sentences = re.split(r'(?<=[.!?]) +', output)
     final_output = ""
     for sentence in sentences:
@@ -246,10 +243,12 @@ def run():
                 if cal_pred:
                     st.warning('**' + cal_pred + ' for a serving of 100 grams**')
                 
+                #Returning the protein of the predicted food label if valid
                 protein_pred = scrape_for_protein(result)
                 if cal_pred:
                     st.warning('**' + protein_pred + ' of protein for a serving of 100 grams**')
 
+                #Returning the nutrition breakdown
                 if result in fruits or result in vegetables:
                     nutrition = return_nutrition(result)
                     if nutrition:
@@ -257,13 +256,14 @@ def run():
                 else:
                     st.warning('Cannot find nutrition breakdown for this food')
 
-
+                #Returning the recipes
                 if result in fruits or result in vegetables:
                     recipe = return_recipe(result)
                     if recipe:
                         st.warning(recipe)
                 else:
                     st.warning('Cannot find recipes for this food')      
+
 
                 st.warning("This language model may be subject to incorrect output, please consider its output with caution")
                 if result in fruits or result in vegetables:
