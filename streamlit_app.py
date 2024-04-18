@@ -102,7 +102,7 @@ def generate_text(input_prompt):
     #Prompting model with fun facts about predicted food
     input_text = input_prompt
     #force_words = [prediction]
-    max_length = 60
+    max_length = 100
 
     #Tokenizing input text
     input_ids = tokenizer(input_text, return_tensors="pt")
@@ -118,7 +118,6 @@ def generate_text(input_prompt):
                             num_beams=10,
                             num_return_sequences=10, 
                             no_repeat_ngram_size=2,
-                            max_new_tokens=60,
                             do_sample=True,
                             top_k=50,
                             early_stopping=True
@@ -236,25 +235,29 @@ def run():
                     st.info('I cannot recognize this food')
 
                 #Using Streamlit success method
-                st.success("**The model predicts this is a : " + result + '**')
-
-                #Returning the calories of the predicted food label if valid
-                cal_pred = scrape_for_calories(result)
-                if cal_pred:
-                    st.warning('**' + cal_pred + ' for a serving of 100 grams**')
-                
-                #Returning the protein of the predicted food label if valid
-                protein_pred = scrape_for_protein(result)
-                if cal_pred:
-                    st.warning('**' + protein_pred + ' of protein for a serving of 100 grams**')
-
-                #Returning the nutrition breakdown
                 if result in fruits or result in vegetables:
-                    nutrition = return_nutrition(result)
-                    if nutrition:
-                        st.warning(nutrition)
-                else:
-                    st.warning('Cannot find nutrition breakdown for this food')
+                    st.success("**The model predicts this is a : " + result + '**')
+
+                    #Returning the calories of the predicted food label if valid
+                    cal_pred = scrape_for_calories(result)
+                    if cal_pred:
+                        st.warning('**' + cal_pred + ' for a serving of 100 grams**')
+                    
+                    #Returning the protein of the predicted food label if valid
+                    protein_pred = scrape_for_protein(result)
+                    if cal_pred:
+                        st.warning('**' + protein_pred + ' of protein for a serving of 100 grams**')
+
+                    #Returning the nutrition breakdown
+                    if result in fruits or result in vegetables:
+                        nutrition = return_nutrition(result)
+                        if nutrition:
+                            st.warning(nutrition)
+                    else:
+                        st.warning('Cannot find nutrition breakdown for this food')
+
+                elif result not in fruits or result not in vegetables:
+                        st.warning('The Model cannot find information for this food')
 
                 #Returning the recipes
                 if result in fruits or result in vegetables:
@@ -301,7 +304,7 @@ def run():
            questions about your food to a chatbot. Good questions to ask are things like the 
            vitamin breakdown in the food, creative ways to use it in cooking, or fun facts about the ingredient. 
            NOTE: Prompts to the chatbot are currently limited to 50 characters or less! The responses from the chatbot
-                 may be subject to non-factual remarks as well, so please proceed with caution!
+                 may be subject to non-factual remarks as well as it is still a small model, so please proceed with caution!
 
 
         Please enjoy my food classification app!
