@@ -1,7 +1,7 @@
 # Computer Vision Food Recognition and Nutritional Analysis
 
 ## Overview
-This project aims to develop a computer vision application that can scan images, recognize and label the food in the image, provide their nutritional profiles, suggest recipes based on the identified ingredients, and implement a chatbot that can generate text about the food based on user input. The application is hosted at https://jakemazmachinelearning.streamlit.app/, allowing users to upload images for analysis. 
+This project aims to develop a computer vision application that can scan images, recognize and label the food in the image, provide their nutritional profiles, suggest recipes based on the identified ingredients, and implement a chatbot that can generate text about the food based on user input. The application is hosted at https://jakemazmachinelearning.streamlit.app/ with a demo at https://www.youtube.com/watch?v=a_KT_N2hFzY&feature=youtu.be, allowing users to upload images for analysis. 
 
 ## Technologies Used
 - Python
